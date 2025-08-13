@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>InfoSeeker | Ask, Search & Learn</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="bg-layers">
+    <div class="layer layer-1"></div>
+    <div class="layer layer-2"></div>
+    <div class="layer layer-3"></div>
+  </div>
+
+  <main class="container">
+    <header class="hero">
+      <h1 class="title">
+        <span class="title-top">InfoSeeker</span>
+        <span class="title-sub">| Ask, Search &amp; Learn</span>
+      </h1>
+      <p class="subtitle">Powered by Team Boyzian — accurate answers sourced directly from Google</p>
+    </header>
+
+    <section class="ask-panel glass">
+      <div class="panel-inner">
+        <label class="label">Ask anything</label>
+        <div class="input-row">
+          <input id="question" type="text" placeholder="Type your question here..." autofocus />
+          <button id="askBtn" class="btn">Ask</button>
+        </div>
+        <div class="controls">
+          <button id="clearBtn" class="btn ghost">Clear</button>
+          <div id="loader" class="loader hidden" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="answer-section" class="answer-panel glass hidden">
+      <div class="panel-inner">
+        <h2 class="answer-title">Answer</h2>
+        <div id="answer" class="answer-body" aria-live="polite"></div>
+
+        <div id="sources" class="sources"></div>
+        <div class="note">
+          <strong>Note:</strong> InfoSeeker collects source data from Google for this answer. Use your judgment — InfoSeeker may make mistakes.
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div>InfoSeeker | Ask, Search &amp; Learn &nbsp;&middot;&nbsp; powered by Team Boyzian</div>
+      <div class="footer-note">InfoSeeker may make mistakes, please be careful!</div>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
