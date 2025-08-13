@@ -34,8 +34,7 @@ InfoSeeker-Netlify/ │ ├── index.html               ← Main UI page ├�
 
 ---
 
-### 2. OpenAI API
-
+### 2. OpenAI ACS
 - Get your **OpenAI API key** from [OpenAI Dashboard](https://platform.openai.com/account/api-keys).
 
 ---
@@ -44,8 +43,7 @@ InfoSeeker-Netlify/ │ ├── index.html               ← Main UI page ├�
 
 1. Create a **Netlify account** and link your GitHub repository (or drag & drop the folder).  
 2. In Netlify dashboard → Site settings → Build & deploy → **Environment variables**, add:
-
-OPENAI_API_KEY = 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 GOOGLE_API_KEY = AIzaSyDuV0O0A36jq76TLGMuHiqxExiuDqiDA2M GOOGLE_CSE_ID   = 5194149544e6041fa
+OPENAI_API_KEY, GOOGLE_API_KEY, GOOGLE_CSE_ID
 
 3. Make sure your `netlify/functions/ask.js` file exists — this is the serverless backend endpoint.
 
