@@ -62,7 +62,7 @@ exports.handler = async function(event, context) {
         'Authorization': `Bearer ${OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4', // you can change to a model you have access to
+        model: 'gpt-4o', // you can change to a model you have access to
         messages: [
           { role: 'system', content: 'You are a helpful assistant that composes answers strictly based on provided web search snippets.' },
           { role: 'user', content: contextText }
