@@ -1,56 +1,60 @@
-// ask.js - Netlify Function
-export async function handler(event) {
+exports.handler = async (event) => {
   try {
-    const { question } = JSON.parse(event.body || "{}");
+    const { question } = JSON.parse(event.body);
 
     if (!question) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Question is required" }),
+        body: JSON.stringify({ error: 'Question is required' }),
       };
     }
 
-    // Call OpenAI GPT-4o-mini
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Missing API Key in environment variables' }),
+      };
+    }
+
+    const prompt = `Answer this question accurately and in detail: ${question}`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        input: `
-You are a math and general knowledge assistant. 
-User asked: "${question}"
-
-If it's math:
-- Solve it completely.
-- Show each step clearly.
-- Use natural math symbols (like sqrt for square root, fractions like a/b).
-- Explain in human-readable form, not code.
-- Avoid programming language syntax unless explicitly requested.
-
-If it's not math:
-- Give a clear, concise answer.
-
-Return only the explanation and steps, no JSON or extra tags.
-        `,
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: prompt },
+        ],
       }),
     });
 
     const data = await response.json();
-    const answer = data.output_text || "No answer returned.";
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || 'OpenAI API error');
+    }
+
+    const answer = data.choices?.[0]?.message?.content || 'No answer found.';
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ answer }),
+      body: JSON.stringify({
+        answer,
+        sources: [
+          { title: 'Google Search', url: `https://www.google.com/search?q=${encodeURIComponent(question)}` },
+        ],
+      }),
     };
-
-  } catch (err) {
-    console.error("Error:", err);
+  } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message || "Internal Server Error" }),
+      body: JSON.stringify({ error: error.message || 'Internal server error' }),
     };
   }
-}
+};
