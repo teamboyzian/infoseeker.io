@@ -1,3 +1,4 @@
+// script.js
 const askBtn = document.getElementById('askBtn');
 const clearBtn = document.getElementById('clearBtn');
 const questionInput = document.getElementById('question');
@@ -5,7 +6,7 @@ const loader = document.getElementById('loader');
 const answerSection = document.getElementById('answer-section');
 const answerEl = document.getElementById('answer');
 const sourcesEl = document.getElementById('sources');
-const overlay = document.getElementById('overlay-loader');
+const geminiOverlay = document.querySelector('.gemini-overlay');
 
 function showLoader(on = true) {
   loader.classList.toggle('hidden', !on);
@@ -13,8 +14,8 @@ function showLoader(on = true) {
   questionInput.disabled = on;
 }
 
-function showOverlay(on = true) {
-  overlay.classList.toggle('hidden', !on);
+function showGeminiOverlay(on = true) {
+  geminiOverlay.classList.toggle('hidden', !on);
   document.body.classList.toggle('blur', on);
 }
 
@@ -55,8 +56,9 @@ async function askQuestion() {
   const q = questionInput.value.trim();
   if (!q) return;
 
+  // Show Gemini overlay + loader
+  showGeminiOverlay(true);
   answerSection.classList.add('hidden');
-  showOverlay(true);
   showLoader(true);
 
   try {
@@ -75,24 +77,29 @@ async function askQuestion() {
     const answer = data.answer || 'No answer returned.';
     const sources = data.sources || [];
 
+    // Hide Gemini overlay + blur
+    showGeminiOverlay(false);
+
+    // Show answer
     answerSection.classList.remove('hidden');
     setAnswerText(answer);
     renderSources(sources);
     answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
+    showGeminiOverlay(false);
     answerSection.classList.remove('hidden');
     answerEl.innerText = 'Error: ' + (err.message || err);
     sourcesEl.innerHTML = '';
     console.error(err);
   } finally {
-    showOverlay(false);
     showLoader(false);
   }
 }
 
+// Events
 askBtn.addEventListener('click', askQuestion);
-questionInput.addEventListener('keydown', e => { if(e.key==='Enter') askQuestion(); });
+questionInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askQuestion(); });
 clearBtn.addEventListener('click', () => {
   questionInput.value = '';
   answerEl.innerText = '';
