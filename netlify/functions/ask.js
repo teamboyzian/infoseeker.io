@@ -2,48 +2,78 @@ import fetch from 'node-fetch';
 
 export async function handler(event) {
   try {
-    const { question } = JSON.parse(event.body);
+    const { question, mathMode, imageBase64 } = JSON.parse(event.body);
 
-    const systemPrompt = `
-You are InfoSeeker AI. Answer user queries accurately.
-If the question is about math, show step-by-step solution clearly.
-Convert technical language like "binary", "LaTeX", or "code-like" formulas into normal language.
-Keep the explanation easy and concise but correct.
-`;
+    if (!question && !imageBase64) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Missing question or image' }),
+      };
+    }
 
-    const response = await fetch('https://api.openai.com/v1/responses', {
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    if (!OPENAI_API_KEY) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Missing environment variables' }),
+      };
+    }
+
+    const messages = [];
+
+    if (mathMode) {
+      messages.push({
+        role: 'system',
+        content: 'You are a math tutor. Solve step by step and explain clearly. If formula is in code or binary, convert it to normal math first.',
+      });
+    } else {
+      messages.push({ role: 'system', content: 'You are an expert assistant for general questions.' });
+    }
+
+    if (question) {
+      messages.push({ role: 'user', content: question });
+    }
+
+    if (imageBase64) {
+      messages.push({
+        role: 'user',
+        content: [
+          { type: 'text', text: 'Analyze this image and answer any math or text question.' },
+          {
+            type: 'image_url',
+            image_url: `data:image/jpeg;base64,${imageBase64}`,
+          },
+        ],
+      });
+    }
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        input: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: question }
-        ],
-        temperature: 0.3,
-        max_output_tokens: 500,
+        model: 'gpt-4o-mini',
+        messages,
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      return { statusCode: response.status, body: errorText };
-    }
-
     const data = await response.json();
-    const answer = data.output_text || 'No answer available.';
+    const answer = data?.choices?.[0]?.message?.content || 'No answer generated.';
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ answer }),
+      body: JSON.stringify({
+        answer,
+        sources: [], // Can be extended if you want Google search integration later
+      }),
     };
-  } catch (error) {
+  } catch (err) {
+    console.error('Error in ask.js:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ error: err.message }),
     };
   }
 }
