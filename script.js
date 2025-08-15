@@ -13,16 +13,17 @@ function showLoader(on = true) {
 }
 
 function setAnswerText(text) {
-  // Render multi-line and simple formatting
   answerEl.innerHTML = '';
-  
-  // Support for line breaks
-  const formatted = text
-    .replace(/\n/g, '<br>')            // Line breaks
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold if Markdown style
-    .replace(/\*(.*?)\*/g, '<em>$1</em>');             // Italic
-
-  answerEl.innerHTML = formatted;
+  let i = 0;
+  const speed = 18;
+  function type() {
+    if (i <= text.length) {
+      answerEl.innerText = text.slice(0, i);
+      i++;
+      setTimeout(type, speed);
+    }
+  }
+  type();
 }
 
 function renderSources(sources) {
@@ -64,10 +65,11 @@ async function askQuestion() {
 
     const data = await resp.json();
     const answer = data.answer || 'No answer returned.';
+    const sources = data.sources || [];
 
     answerSection.classList.remove('hidden');
     setAnswerText(answer);
-    sourcesEl.innerHTML = '';
+    renderSources(sources);
     answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
@@ -80,7 +82,6 @@ async function askQuestion() {
   }
 }
 
-// events
 askBtn.addEventListener('click', askQuestion);
 questionInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askQuestion(); });
 clearBtn.addEventListener('click', () => {
