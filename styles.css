@@ -1,4 +1,3 @@
-/* ==================== Original Styles ==================== */
 :root {
   --bg-dark: #0e0e10;
   --accent: #5a67d8;
@@ -9,77 +8,144 @@
   --muted: #a0aec0;
 }
 
-* { box-sizing: border-box; margin:0; padding:0; font-family:'Inter',sans-serif; }
-body { background: var(--bg-dark); color: var(--text-light); min-height:100vh; display:flex; justify-content:center; align-items:center; padding:16px; position:relative; overflow-x:hidden; transition:0.3s;}
-body.blur { filter: blur(6px); }
+/* Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
 
-#bg-layers { position: fixed; top:0; left:0; width:100%; height:100%; overflow:hidden; z-index:-1; }
-.layer { position:absolute; width:200%; height:200%; border-radius:50%; filter:blur(120px); opacity:0.3; animation: float 20s infinite ease-in-out; }
-.layer-1 { background:#5a67d8; top:-50%; left:-50%; }
-.layer-2 { background:#805ad5; top:0%; left:-20%; animation-delay:5s; }
-.layer-3 { background:#48bb78; top:40%; left:-10%; animation-delay:10s; }
-@keyframes float { 0%,100%{transform:translate(0,0);} 50%{transform:translate(30px,50px);} }
+body {
+  background: var(--bg-dark);
+  color: var(--text-light);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  position: relative;
+  overflow-x: hidden;
+  transition: filter 0.3s ease;
+}
 
-.container { width:100%; max-width:720px; display:flex; flex-direction:column; gap:20px; }
-.hero { text-align:center; }
-.title { font-size:2.4rem; font-weight:800; }
+body.blur {
+  filter: blur(6px);
+}
+
+#bg-layers {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.layer {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.3;
+  animation: float 20s infinite ease-in-out;
+}
+
+.layer-1 { background: #5a67d8; top: -50%; left: -50%; }
+.layer-2 { background: #805ad5; top: 0%; left: -20%; animation-delay: 5s; }
+.layer-3 { background: #48bb78; top: 40%; left: -10%; animation-delay: 10s; }
+
+@keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px,50px); } }
+
+.container { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 20px; }
+
+.hero { text-align: center; }
+.title { font-size: 2.4rem; font-weight: 800; }
 .title-top { color: var(--accent-light); }
-.subtitle { margin-top:8px; font-size:1rem; color:var(--muted); }
-.glass { background: var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter: blur(12px); border-radius:16px; padding:20px; }
-.ask-panel .input-row { display:flex; gap:10px; margin-top:12px; }
-.input-row input { flex:1; padding:12px; border-radius:10px; border:1px solid #2d2d30; background:#1a1a1d; color: var(--text-light); font-size:1rem; }
-.input-row input:focus { outline:2px solid var(--accent-light); }
-.btn { background: var(--accent); color:#fff; padding:12px 16px; border-radius:10px; font-size:1rem; font-weight:600; cursor:pointer; border:none; transition:0.2s; }
+.subtitle { margin-top: 8px; font-size: 1rem; color: var(--muted); }
+
+.glass { background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(12px); border-radius: 16px; padding: 20px; }
+
+.ask-panel .input-row { display: flex; gap: 10px; margin-top: 12px; }
+.input-row input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #2d2d30; background: #1a1a1d; color: var(--text-light); font-size: 1rem; }
+.input-row input:focus { outline: 2px solid var(--accent-light); }
+
+.btn { background: var(--accent); color: #fff; padding: 12px 16px; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
 .btn:hover { background: var(--accent-light); }
-.btn.ghost { background:transparent; color: var(--muted); border:1px solid var(--muted); }
-.controls { margin-top:12px; display:flex; align-items:center; gap:12px; }
-.loader { width:20px; height:20px; border:3px solid var(--muted); border-top:3px solid var(--accent); border-radius:50%; animation:spin 1s linear infinite; }
-.hidden { display:none; }
-@keyframes spin { to{transform:rotate(360deg);} }
+.btn.ghost { background: transparent; color: var(--muted); border: 1px solid var(--muted); }
+
+.controls { margin-top: 12px; display: flex; align-items: center; gap: 12px; }
+.loader { width: 20px; height: 20px; border: 3px solid var(--muted); border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+.hidden { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .answer-panel { animation: fadeIn 0.4s ease-in-out; }
-.answer-title { font-size:1.5rem; margin-bottom:10px; }
-.answer-body { white-space:pre-wrap; line-height:1.6; font-size:1rem; color:#e2e8f0; }
-.sources { margin-top:12px; display:flex; flex-direction:column; gap:6px; }
-.sources a { color: var(--accent-light); text-decoration:none; font-size:0.95rem; }
-.sources a:hover { text-decoration:underline; }
-.note { font-size:0.8rem; color:var(--muted); margin-top:12px; }
-.site-footer { text-align:center; font-size:0.9rem; color: var(--muted); margin-top:10px; }
-.footer-note { font-size:0.75rem; margin-top:6px; }
+.answer-title { font-size: 1.5rem; margin-bottom: 10px; }
+.answer-body { white-space: pre-wrap; line-height: 1.6; font-size: 1rem; color: #e2e8f0; }
+.sources { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.sources a { color: var(--accent-light); text-decoration: none; font-size: 0.95rem; }
+.sources a:hover { text-decoration: underline; }
+.note { font-size: 0.8rem; color: var(--muted); margin-top: 12px; }
 
-@media (max-width:600px){ .title{font-size:1.8rem;} .btn{font-size:0.9rem; padding:10px;} }
+.site-footer { text-align: center; font-size: 0.9rem; color: var(--muted); margin-top: 10px; }
+.footer-note { font-size: 0.75rem; margin-top: 6px; }
 
-/* ==================== Gemini Loader Styles ==================== */
-#overlay-loader {
-  position: fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center;
-  background: rgba(0,0,0,0.7); z-index:1000;
-  flex-direction:column;
+@media (max-width: 600px) {
+  .title { font-size: 1.8rem; }
+  .btn { font-size: 0.9rem; padding: 10px; }
 }
-#overlay-loader.hidden { display:none; }
 
-.ring { position:absolute; border:2px solid rgba(123,92,255,0.4); border-radius:50%; width:120px; height:120px; animation:ringAnim 2.5s infinite; }
-.ring:nth-child(1){animation-delay:0s;}
-.ring:nth-child(2){animation-delay:0.8s;width:150px;height:150px;border-color:rgba(123,92,255,0.3);}
-.ring:nth-child(3){animation-delay:1.6s;width:180px;height:180px;border-color:rgba(123,92,255,0.2);}
-@keyframes ringAnim {0%{transform:scale(0.5);opacity:0.7;}50%{transform:scale(1.2);opacity:0.1;}100%{transform:scale(0.5);opacity:0.7;}}
+/* ==== Gemini Loader Overlay ==== */
+.gemini-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(15,17,26,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+  flex-direction: column;
+}
 
-.logo { width:90px;height:90px;background:url('https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_Gemini_logo.svg') no-repeat center/contain; animation:floatGlow 2s ease-in-out infinite; z-index:2; }
-.wait-text { margin-top:20px; color:#fff; font-size:1.3rem; letter-spacing:1px; animation:waveText 2s ease-in-out infinite; z-index:2; }
+.gemini-overlay.hidden { display: none; }
 
-@keyframes floatGlow {0%{transform:translateY(0) scale(1); filter:drop-shadow(0 0 10px #7b5cff);}50%{transform:translateY(-10px) scale(1.05); filter:drop-shadow(0 0 25px #a892ff);}100%{transform:translateY(0) scale(1); filter:drop-shadow(0 0 10px #7b5cff);}}
-@keyframes waveText {0%,100%{opacity:0.3; transform:translateY(0);}50%{opacity:1; transform:translateY(-5px);}}
+.gemini-loader {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
 
-.trail { position:absolute; width:8px;height:8px; background:#7b5cff; border-radius:50%; opacity:0.8; top:50%; left:50%; transform-origin:-50px 0px; animation:trailAnim 2s linear infinite; }
-.trail:nth-child(1){animation-delay:0s;} .trail:nth-child(2){animation-delay:0.3s;} .trail:nth-child(3){animation-delay:0.6s;} .trail:nth-child(4){animation-delay:0.9s;}
-@keyframes trailAnim {0%{transform:rotate(0deg) translateX(50px) scale(1);opacity:1;}50%{transform:rotate(180deg) translateX(50px) scale(1.5);opacity:0.2;}100%{transform:rotate(360deg) translateX(50px) scale(1);opacity:1;}}
+.gemini-ring {
+  position: absolute;
+  border: 2px solid rgba(123, 92, 255, 0.4);
+  border-radius: 50%;
+  width: 120px; height: 120px;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  animation: ringAnim 2.5s infinite;
+}
+.gemini-ring:nth-child(2) { width: 150px; height: 150px; border-color: rgba(123,92,255,0.3); animation-delay: 0.8s; }
+.gemini-ring:nth-child(3) { width: 180px; height: 180px; border-color: rgba(123,92,255,0.2); animation-delay: 1.6s; }
 
-.particle { position:absolute; width:4px;height:4px; background:#a892ff; border-radius:50%; opacity:0.6; animation:sparkle 3s linear infinite; }
-.particle1{top:20%;left:40%;animation-delay:0s;}
-.particle2{top:60%;left:30%;animation-delay:0.5s;}
-.particle3{top:50%;left:70%;animation-delay:1s;}
-.particle4{top:30%;left:60%;animation-delay:1.5s;}
-.particle5{top:70%;left:50%;animation-delay:2s;}
-.particle6{top:40%;left:20%;animation-delay:2.5s;}
-.particle7{top:25%;left:75%;animation-delay:3s;}
-.particle8{top:55%;left:80%;animation-delay:3.5s;}
-@keyframes sparkle{0%,100%{transform:translate(0,0) scale(1);opacity:0.6;}50%{transform:translate(calc(-10px + 20px*0.5), calc(-10px + 20px*0.5)) scale(1.5);opacity:0.2;}}
+@keyframes ringAnim {
+  0% { transform: translate(-50%,-50%) scale(0.5); opacity: 0.7; }
+  50% { transform: translate(-50%,-50%) scale(1.2); opacity: 0.1; }
+  100% { transform: translate(-50%,-50%) scale(0.5); opacity: 0.7; }
+}
+
+/* Floating Logo */
+.gemini-logo {
+  width: 90px; height: 90px;
+  background: url('https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_Gemini_logo.svg') no-repeat center/contain;
+  animation: floatGlow 2s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes floatGlow {
+  0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 10px #7b5cff); }
+  50% { transform: translateY(-10px) scale(1.05); filter: drop-shadow(0 0 25px #a892ff); }
+  100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 10px #7b5cff); }
+}
