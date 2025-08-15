@@ -1,49 +1,64 @@
-import fetch from 'node-fetch';
-
-export async function handler(event) {
+// ask.js
+exports.handler = async (event) => {
   try {
     const { question } = JSON.parse(event.body);
 
-    const systemPrompt = `
-You are InfoSeeker AI. Answer user queries accurately.
-If the question is about math, show step-by-step solution clearly.
-Convert technical language like "binary", "LaTeX", or "code-like" formulas into normal language.
-Keep the explanation easy and concise but correct.
-`;
+    if (!question) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Question is required' }),
+      };
+    }
 
-    const response = await fetch('https://api.openai.com/v1/responses', {
+    // Use Google + GPT (or your chosen API)
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Missing API Key in environment variables' }),
+      };
+    }
+
+    // Prepare the prompt
+    const prompt = `Answer this question accurately and in detail: ${question}`;
+
+    // Call OpenAI (GPT-4o Mini or your selected model)
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        input: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: question }
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: prompt },
         ],
-        temperature: 0.3,
-        max_output_tokens: 500,
       }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorText = await response.text();
-      return { statusCode: response.status, body: errorText };
+      throw new Error(data.error?.message || 'OpenAI API error');
     }
 
-    const data = await response.json();
-    const answer = data.output_text || 'No answer available.';
+    const answer = data.choices?.[0]?.message?.content || 'No answer found.';
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ answer }),
+      body: JSON.stringify({
+        answer,
+        sources: [
+          { title: 'Google Search', url: `https://www.google.com/search?q=${encodeURIComponent(question)}` },
+        ],
+      }),
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ error: error.message || 'Internal server error' }),
     };
   }
-}
+};
