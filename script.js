@@ -2,47 +2,18 @@
 const askBtn = document.getElementById('askBtn');
 const clearBtn = document.getElementById('clearBtn');
 const questionInput = document.getElementById('question');
-const loader = document.getElementById('loader');
 const answerSection = document.getElementById('answer-section');
 const answerEl = document.getElementById('answer');
 const sourcesEl = document.getElementById('sources');
+const overlayLoader = document.getElementById('overlay-loader');
 
 function showLoader(on = true) {
-  loader.classList.toggle('hidden', !on);
+  overlayLoader.classList.toggle('hidden', !on);
   askBtn.disabled = on;
   questionInput.disabled = on;
-
-  if (on) {
-    // inject animation HTML only when loader is shown
-    loader.innerHTML = `
-      <div class="ring ring1"></div>
-      <div class="ring ring2"></div>
-      <div class="ring ring3"></div>
-
-      <div class="trail trail1"></div>
-      <div class="trail trail2"></div>
-      <div class="trail trail3"></div>
-      <div class="trail trail4"></div>
-
-      <div class="logo"></div>
-      <div class="wait-text">Wait for a second...</div>
-
-      <div class="particle particle1"></div>
-      <div class="particle particle2"></div>
-      <div class="particle particle3"></div>
-      <div class="particle particle4"></div>
-      <div class="particle particle5"></div>
-      <div class="particle particle6"></div>
-      <div class="particle particle7"></div>
-      <div class="particle particle8"></div>
-    `;
-  } else {
-    loader.innerHTML = ''; // remove animation when done
-  }
 }
 
 function setAnswerText(text) {
-  // typing effect
   answerEl.innerHTML = '';
   let i = 0;
   const speed = 18;
@@ -101,7 +72,6 @@ async function askQuestion() {
     answerSection.classList.remove('hidden');
     setAnswerText(answer);
     renderSources(sources);
-    // scroll into view
     answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
