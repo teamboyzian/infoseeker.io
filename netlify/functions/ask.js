@@ -1,127 +1,60 @@
 // netlify/functions/ask.js
-// Node 18+ runtime assumed
+// Runtime: Node 18+ expected (global fetch available)
+// Make sure to set OPENAI_API_KEY, GOOGLE_API_KEY, GOOGLE_CSE_ID in Netlify env vars
 
-const MATH_HINT_WORDS = [
-  'solve', 'evaluate', 'derivative', 'integral', 'limit', 'equation', 'factor',
-  'simplify', 'expand', 'root', 'graph', 'compute', 'probability', 'sum', 'series'
-];
-const MATH_REGEX = /[0-9][0-9\s\+\-\*\/\^\=\(\)\[\]\{\}\.\,\:]*[0-9]|\\(frac|sqrt|int|sum)|\b(d\/dx|dx|dy|sin|cos|tan|log|ln|lim)\b/i;
-
-function looksLikeMath(q = '') {
-  const s = q.toLowerCase();
-  if (MATH_REGEX.test(s)) return true;
-  return MATH_HINT_WORDS.some(w => s.includes(w));
-}
-
-exports.handler = async function(event) {
+exports.handler = async function(event, context) {
   try {
     if (event.httpMethod !== 'POST') {
       return { statusCode: 405, body: 'Method Not Allowed' };
     }
+    const body = JSON.parse(event.body || '{}');
+    const question = (body.question || '').trim();
+    if (!question) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Question is required' }) };
+    }
 
-    const {
-      question = '',
-      mode: clientMode // "math" | "web" | undefined
-    } = JSON.parse(event.body || '{}');
-
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
     const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
     const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID;
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-    if (!OPENAI_API_KEY) {
-      return { statusCode: 500, body: JSON.stringify({ error: 'Missing environment variables: OPENAI_API_KEY' }) };
+    if (!GOOGLE_API_KEY || !GOOGLE_CSE_ID || !OPENAI_API_KEY) {
+      return { statusCode: 500, body: JSON.stringify({ error: 'Missing environment variables' }) };
     }
 
-    const serverThinksMath = looksLikeMath(question);
-    const mode = clientMode === 'math' || (clientMode !== 'web' && serverThinksMath) ? 'math' : 'web';
-
-    if (mode === 'math') {
-      // --- Math Pipeline (no external web sources) ---
-      const system = [
-        'You are a rigorous math tutor.',
-        'Solve problems step-by-step with clear, numbered steps.',
-        'ALWAYS verify the final result by substitution or a quick reverse-check.',
-        'If multiple interpretations exist, state assumptions briefly.',
-        'Use plain text; include LaTeX only if necessary.'
-      ].join(' ');
-
-      const user = [
-        'Solve the following problem step-by-step and then verify the final answer.',
-        'Show these sections exactly:',
-        '1) Steps',
-        '2) Final Answer',
-        '3) Verification',
-        '',
-        `Problem: ${question}`
-      ].join('\n');
-
-      const openaiResp = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          temperature: 0.0,
-          max_tokens: 900,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user }
-          ]
-        })
-      });
-
-      if (!openaiResp.ok) {
-        const t = await openaiResp.text();
-        return { statusCode: 502, body: JSON.stringify({ error: 'OpenAI API error (math)', details: t }) };
-      }
-
-      const data = await openaiResp.json();
-      const answer = data?.choices?.[0]?.message?.content || 'No answer.';
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          mode: 'math',
-          answer,
-          sources: [] // No external sources for pure math
-        })
-      };
-    }
-
-    // --- Web Pipeline (Google + OpenAI) ---
-    if (!GOOGLE_API_KEY || !GOOGLE_CSE_ID) {
-      return { statusCode: 500, body: JSON.stringify({ error: 'Missing environment variables: GOOGLE_API_KEY or GOOGLE_CSE_ID' }) };
-    }
-
+    // 1) Call Google Custom Search API
     const q = encodeURIComponent(question);
     const googleUrl = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CSE_ID}&q=${q}&num=6`;
-
     const googleResp = await fetch(googleUrl);
     if (!googleResp.ok) {
       const t = await googleResp.text();
       return { statusCode: 502, body: JSON.stringify({ error: 'Google API error', details: t }) };
     }
+    const googleJson = await googleResp.json();
+    const items = googleJson.items || [];
 
-    const gjson = await googleResp.json();
-    const items = gjson.items || [];
-    const snippets = [];
+    // prepare snippets and sources
+    const topSnippets = [];
     const sources = [];
-
     for (const it of items) {
       const title = it.title || it.displayLink || it.link;
       const link = it.link;
       const snippet = it.snippet || '';
-      if (link) sources.push({ title, url: link });
-      if (snippet) snippets.push({ title, link, snippet });
+      if (link) {
+        sources.push({ title, url: link });
+      }
+      if (snippet) {
+        topSnippets.push({ title, link, snippet });
+      }
     }
 
-    let context = 'Use ONLY the following Google snippets to answer. If uncertain, say so.\n\n';
-    snippets.forEach((s, i) => {
-      context += `Result ${i + 1}: ${s.title}\n${s.link}\nSnippet: ${s.snippet}\n\n`;
+    // 2) Build prompt for OpenAI - instruct to use ONLY the provided snippets (Google) to answer
+    let contextText = 'You are provided with the following search results pulled from Google Custom Search. Use ONLY these results to compose a concise, accurate answer to the user question. Do NOT invent facts beyond these results. If something is uncertain, say so and point the user to the sources.\n\n';
+    topSnippets.forEach((s, i) => {
+      contextText += `Result ${i+1} — Title: ${s.title}\nLink: ${s.link}\nSnippet: ${s.snippet}\n\n`;
     });
-    context += `User question: ${question}\n\nProvide a concise answer, then a short "Sources used" list.`;
+    contextText += `User question: ${question}\n\nNow produce:\n1) A short clear answer (2-6 paragraphs max) based only on the results above.\n2) After the answer, produce a short "Sources used" list that matches the provided links.\n3) If the results are insufficient, explicitly say the information is unclear and list the links for further reading.\n\nAnswer:\n`;
 
+    // Call OpenAI Chat Completions
     const openaiResp = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -129,28 +62,29 @@ exports.handler = async function(event) {
         'Authorization': `Bearer ${OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // you can swap to gpt-4o/gpt-4 if desired
-        temperature: 0.1,
-        max_tokens: 900,
+        model: 'gpt-4', // you can change to a model you have access to
         messages: [
-          { role: 'system', content: 'You answer strictly from provided web snippets and do not invent sources.' },
-          { role: 'user', content: context }
-        ]
+          { role: 'system', content: 'You are a helpful assistant that composes answers strictly based on provided web search snippets.' },
+          { role: 'user', content: contextText }
+        ],
+        temperature: 0.1,
+        max_tokens: 900
       })
     });
 
     if (!openaiResp.ok) {
       const t = await openaiResp.text();
-      return { statusCode: 502, body: JSON.stringify({ error: 'OpenAI API error (web)', details: t }) };
+      return { statusCode: 502, body: JSON.stringify({ error: 'OpenAI API error', details: t }) };
     }
+    const openaiJson = await openaiResp.json();
+    const aiMessage = openaiJson.choices && openaiJson.choices[0] && openaiJson.choices[0].message && openaiJson.choices[0].message.content;
+    const answerText = aiMessage || 'No answer generated by AI.';
 
-    const data = await openaiResp.json();
-    const answer = data?.choices?.[0]?.message?.content || 'No answer generated.';
+    // 3) Return combined answer + exact sources used (we return the Google links)
     return {
       statusCode: 200,
       body: JSON.stringify({
-        mode: 'web',
-        answer,
+        answer: answerText,
         sources: sources.slice(0, 6)
       })
     };
