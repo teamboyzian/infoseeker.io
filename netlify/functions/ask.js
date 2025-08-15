@@ -1,4 +1,3 @@
-// ask.js
 exports.handler = async (event) => {
   try {
     const { question } = JSON.parse(event.body);
@@ -10,7 +9,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // Use Google + GPT (or your chosen API)
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return {
@@ -19,10 +17,8 @@ exports.handler = async (event) => {
       };
     }
 
-    // Prepare the prompt
     const prompt = `Answer this question accurately and in detail: ${question}`;
 
-    // Call OpenAI (GPT-4o Mini or your selected model)
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
