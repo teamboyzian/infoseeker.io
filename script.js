@@ -1,4 +1,3 @@
-// script.js
 const askBtn = document.getElementById('askBtn');
 const clearBtn = document.getElementById('clearBtn');
 const questionInput = document.getElementById('question');
@@ -14,10 +13,9 @@ function showLoader(on = true) {
 }
 
 function setAnswerText(text) {
-  // typing effect
   answerEl.innerHTML = '';
   let i = 0;
-  const speed = 18;
+  const speed = 15;
   function type() {
     if (i <= text.length) {
       answerEl.innerText = text.slice(0, i);
@@ -69,11 +67,9 @@ async function askQuestion() {
     const answer = data.answer || 'No answer returned.';
     const sources = data.sources || [];
 
-    // show
     answerSection.classList.remove('hidden');
     setAnswerText(answer);
     renderSources(sources);
-    // scroll into view
     answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
@@ -86,7 +82,6 @@ async function askQuestion() {
   }
 }
 
-// events
 askBtn.addEventListener('click', askQuestion);
 questionInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askQuestion(); });
 clearBtn.addEventListener('click', () => {
