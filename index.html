@@ -32,6 +32,7 @@
         </div>
         <div class="controls">
           <button id="clearBtn" class="btn ghost">Clear</button>
+          <div id="loader" class="loader hidden" aria-hidden="true"></div>
         </div>
       </div>
     </section>
@@ -40,7 +41,6 @@
       <div class="panel-inner">
         <h2 class="answer-title">Answer</h2>
         <div id="answer" class="answer-body" aria-live="polite"></div>
-
         <div id="sources" class="sources"></div>
         <div class="note">
           <strong>Note:</strong> InfoSeeker collects source data from Google for this answer. Use your judgment — InfoSeeker may make mistakes.
@@ -59,12 +59,15 @@
     <div class="ring"></div>
     <div class="ring"></div>
     <div class="ring"></div>
+
     <div class="trail"></div>
     <div class="trail"></div>
     <div class="trail"></div>
     <div class="trail"></div>
+
     <div class="logo"></div>
     <div class="wait-text">Wait for a second...</div>
+
     <div class="particle particle1"></div>
     <div class="particle particle2"></div>
     <div class="particle particle3"></div>
