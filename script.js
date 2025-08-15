@@ -11,6 +11,34 @@ function showLoader(on = true) {
   loader.classList.toggle('hidden', !on);
   askBtn.disabled = on;
   questionInput.disabled = on;
+
+  if (on) {
+    // inject animation HTML only when loader is shown
+    loader.innerHTML = `
+      <div class="ring ring1"></div>
+      <div class="ring ring2"></div>
+      <div class="ring ring3"></div>
+
+      <div class="trail trail1"></div>
+      <div class="trail trail2"></div>
+      <div class="trail trail3"></div>
+      <div class="trail trail4"></div>
+
+      <div class="logo"></div>
+      <div class="wait-text">Wait for a second...</div>
+
+      <div class="particle particle1"></div>
+      <div class="particle particle2"></div>
+      <div class="particle particle3"></div>
+      <div class="particle particle4"></div>
+      <div class="particle particle5"></div>
+      <div class="particle particle6"></div>
+      <div class="particle particle7"></div>
+      <div class="particle particle8"></div>
+    `;
+  } else {
+    loader.innerHTML = ''; // remove animation when done
+  }
 }
 
 function setAnswerText(text) {
