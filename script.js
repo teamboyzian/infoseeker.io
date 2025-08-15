@@ -1,16 +1,21 @@
-// script.js
 const askBtn = document.getElementById('askBtn');
 const clearBtn = document.getElementById('clearBtn');
 const questionInput = document.getElementById('question');
+const loader = document.getElementById('loader');
 const answerSection = document.getElementById('answer-section');
 const answerEl = document.getElementById('answer');
 const sourcesEl = document.getElementById('sources');
-const overlayLoader = document.getElementById('overlay-loader');
+const overlay = document.getElementById('overlay-loader');
 
 function showLoader(on = true) {
-  overlayLoader.classList.toggle('hidden', !on);
+  loader.classList.toggle('hidden', !on);
   askBtn.disabled = on;
   questionInput.disabled = on;
+}
+
+function showOverlay(on = true) {
+  overlay.classList.toggle('hidden', !on);
+  document.body.classList.toggle('blur', on);
 }
 
 function setAnswerText(text) {
@@ -49,7 +54,9 @@ function renderSources(sources) {
 async function askQuestion() {
   const q = questionInput.value.trim();
   if (!q) return;
+
   answerSection.classList.add('hidden');
+  showOverlay(true);
   showLoader(true);
 
   try {
@@ -68,7 +75,6 @@ async function askQuestion() {
     const answer = data.answer || 'No answer returned.';
     const sources = data.sources || [];
 
-    // show
     answerSection.classList.remove('hidden');
     setAnswerText(answer);
     renderSources(sources);
@@ -80,13 +86,13 @@ async function askQuestion() {
     sourcesEl.innerHTML = '';
     console.error(err);
   } finally {
+    showOverlay(false);
     showLoader(false);
   }
 }
 
-// events
 askBtn.addEventListener('click', askQuestion);
-questionInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askQuestion(); });
+questionInput.addEventListener('keydown', e => { if(e.key==='Enter') askQuestion(); });
 clearBtn.addEventListener('click', () => {
   questionInput.value = '';
   answerEl.innerText = '';
