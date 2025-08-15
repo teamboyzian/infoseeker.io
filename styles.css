@@ -233,3 +233,114 @@ body {
     padding: 10px;
   }
 }
+
+/* ===== Loader / Ring Animation ===== */
+.loader {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  width: 200px;
+  height: 200px;
+  z-index: 100;
+}
+
+.loader.hidden { display: none; }
+
+/* Glowing Rings */
+.ring {
+  position: absolute;
+  border: 2px solid rgba(123,92,255,0.4);
+  border-radius: 50%;
+  animation: ringAnim 2.5s infinite linear;
+}
+
+.ring1 { width: 120px; height: 120px; animation-delay: 0s; }
+.ring2 { width: 150px; height: 150px; animation-delay: 0.8s; border-color: rgba(123,92,255,0.3);}
+.ring3 { width: 180px; height: 180px; animation-delay: 1.6s; border-color: rgba(123,92,255,0.2); }
+
+@keyframes ringAnim {
+  0% { transform: scale(0.5); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 0.1; }
+  100% { transform: scale(0.5); opacity: 0.7; }
+}
+
+/* Floating Logo */
+.logo {
+  width: 80px;
+  height: 80px;
+  background: url('https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_Gemini_logo.svg') no-repeat center/contain;
+  animation: floatGlow 2s ease-in-out infinite;
+  z-index: 2;
+}
+
+.wait-text {
+  margin-top: 15px;
+  color: #fff;
+  font-size: 1rem;
+  animation: waveText 2s ease-in-out infinite;
+}
+
+@keyframes floatGlow {
+  0%,100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 10px #7b5cff);}
+  50% { transform: translateY(-8px) scale(1.05); filter: drop-shadow(0 0 25px #a892ff);}
+}
+
+@keyframes waveText {
+  0%,100% { opacity: 0.3; transform: translateY(0);}
+  50% { opacity: 1; transform: translateY(-5px);}
+}
+
+/* Light trails around logo */
+.trail {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #7b5cff;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: -40px 0;
+  animation: trailAnim 2s linear infinite;
+}
+
+.trail1 { animation-delay: 0s; }
+.trail2 { animation-delay: 0.3s; }
+.trail3 { animation-delay: 0.6s; }
+.trail4 { animation-delay: 0.9s; }
+
+@keyframes trailAnim {
+  0% { transform: rotate(0deg) translateX(40px) scale(1); opacity: 1; }
+  50% { transform: rotate(180deg) translateX(40px) scale(1.5); opacity: 0.2; }
+  100% { transform: rotate(360deg) translateX(40px) scale(1); opacity: 1; }
+}
+
+/* Sparkle particles */
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #a892ff;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: sparkle 3s linear infinite;
+}
+
+.particle1 { top: 20%; left: 40%; animation-delay: 0s;}
+.particle2 { top: 60%; left: 30%; animation-delay: 0.5s;}
+.particle3 { top: 50%; left: 70%; animation-delay: 1s;}
+.particle4 { top: 30%; left: 60%; animation-delay: 1.5s;}
+.particle5 { top: 70%; left: 50%; animation-delay: 2s;}
+.particle6 { top: 40%; left: 20%; animation-delay: 2.5s;}
+.particle7 { top: 25%; left: 75%; animation-delay: 3s;}
+.particle8 { top: 55%; left: 80%; animation-delay: 3.5s;}
+
+@keyframes sparkle {
+  0%,100% { transform: translate(0,0) scale(1); opacity:0.6; }
+  50% { transform: translate
