@@ -99,8 +99,8 @@ async function askQuestion() {
 
 // Initial overlay on site entry
 window.addEventListener('load', () => {
-  showGeminiOverlay("Assalamu Alaikum & Welcome");
-  setTimeout(() => hideGeminiOverlay(), 3000);
+  showGeminiOverlay("Assalamu Alaikum & Welcome to 𝐈𝐧𝐟𝐨𝐒𝐞𝐞𝐤𝐞𝐫 | 𝗔𝘀𝗸, 𝗦𝗲𝗮𝗿𝗰𝗵 & 𝗟𝗲𝗮𝗿𝗻");
+  setTimeout(() => hideGeminiOverlay(), 5000);
 });
 
 askBtn.addEventListener('click', askQuestion);
