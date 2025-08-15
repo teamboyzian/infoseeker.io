@@ -21,7 +21,6 @@ body{
   overflow:auto;
 }
 
-/* decorative layered background for parallax (9D-like) */
 #bg-layers{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .layer{
   position:absolute;
@@ -38,7 +37,6 @@ body{
 
 .container{position:relative;z-index:5;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:48px 20px}
 
-/* header */
 .hero{max-width:1100px;text-align:center;margin-bottom:22px}
 .title{
   display:inline-flex;align-items:baseline;gap:14px;font-weight:800;letter-spacing:-0.02em;
@@ -50,7 +48,6 @@ body{
 .title-sub{font-weight:600;font-size:0.75em;color:var(--muted);margin-left:6px}
 .subtitle{color:var(--muted);margin-top:6px;font-size:0.95rem}
 
-/* glass panels */
 .glass{
   background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
   border: 1px solid rgba(255,255,255,0.05);
@@ -88,27 +85,27 @@ input[type="text"]:focus{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0
 .hidden{display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* answer */
 .answer-panel{width:100%;max-width:980px;padding:18px;margin-top:14px}
 .answer-title{font-size:1.05rem;margin:0 0 12px 0;color:var(--muted)}
-.answer-body{min-height:130px;font-size:1.02rem;line-height:1.6;color:var(--text)}
+.answer-body{
+  min-height:130px;font-size:1.02rem;line-height:1.6;color:var(--text);
+  white-space:pre-wrap; /* To show steps clearly */
+  font-family: "Inter", monospace;
+}
 .sources{margin-top:16px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:12px}
 .sources a{display:block;color:var(--muted);text-decoration:none;margin:6px 0}
 .sources a:hover{text-decoration:underline;color:var(--text)}
 .note{margin-top:12px;color:var(--muted);font-size:0.9rem}
 
-/* footer */
 .site-footer{margin-top:32px;text-align:center;color:var(--muted);font-size:0.9rem;opacity:0.95}
 .footer-note{margin-top:6px;color:rgba(255,255,255,0.65);font-size:0.85rem}
 
-/* small screens */
 @media (max-width:640px){
   .input-row{flex-direction:column;align-items:stretch}
   .btn{width:100%}
   .controls{flex-direction:column;gap:10px;align-items:stretch}
 }
 
-/* title entrance animation */
 @keyframes titleEnter {
   0% { transform: translateY(-12px) scale(.98); opacity:0 }
   60% { transform: translateY(6px) scale(1.02); opacity:1 }
