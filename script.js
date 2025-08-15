@@ -15,7 +15,7 @@ function showLoader(on = true) {
 function setAnswerText(text) {
   answerEl.innerHTML = '';
   let i = 0;
-  const speed = 15;
+  const speed = 18;
   function type() {
     if (i <= text.length) {
       answerEl.innerText = text.slice(0, i);
