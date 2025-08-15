@@ -7,15 +7,12 @@ const answerSection = document.getElementById('answer-section');
 const answerEl = document.getElementById('answer');
 const sourcesEl = document.getElementById('sources');
 const geminiOverlay = document.getElementById('geminiOverlay');
+const geminiText = document.getElementById('geminiText');
 
 function showLoader(on = true) {
   loader.classList.toggle('hidden', !on);
   askBtn.disabled = on;
   questionInput.disabled = on;
-}
-
-function showGeminiOverlay(show = true) {
-  geminiOverlay.classList.toggle('hidden', !show);
 }
 
 function setAnswerText(text) {
@@ -51,14 +48,21 @@ function renderSources(sources) {
   });
 }
 
+function showGeminiOverlay(text) {
+  geminiText.textContent = text;
+  geminiOverlay.classList.remove('hidden');
+}
+
+function hideGeminiOverlay() {
+  geminiOverlay.classList.add('hidden');
+}
+
 async function askQuestion() {
   const q = questionInput.value.trim();
   if (!q) return;
 
-  // Show Gemini loader
-  showGeminiOverlay(true);
-
   answerSection.classList.add('hidden');
+  showGeminiOverlay("Just wait a moment, please !");
   showLoader(true);
 
   try {
@@ -77,27 +81,28 @@ async function askQuestion() {
     const answer = data.answer || 'No answer returned.';
     const sources = data.sources || [];
 
-    // hide Gemini loader
-    showGeminiOverlay(false);
-
-    // show answer
     answerSection.classList.remove('hidden');
     setAnswerText(answer);
     renderSources(sources);
     answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
-    showGeminiOverlay(false);
     answerSection.classList.remove('hidden');
     answerEl.innerText = 'Error: ' + (err.message || err);
     sourcesEl.innerHTML = '';
     console.error(err);
   } finally {
     showLoader(false);
+    hideGeminiOverlay();
   }
 }
 
-// Events
+// Initial overlay on site entry
+window.addEventListener('load', () => {
+  showGeminiOverlay("Assalamu Alaikum & Welcome");
+  setTimeout(() => hideGeminiOverlay(), 3000);
+});
+
 askBtn.addEventListener('click', askQuestion);
 questionInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askQuestion(); });
 clearBtn.addEventListener('click', () => {
