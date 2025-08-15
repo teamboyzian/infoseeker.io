@@ -6,17 +6,12 @@ const loader = document.getElementById('loader');
 const answerSection = document.getElementById('answer-section');
 const answerEl = document.getElementById('answer');
 const sourcesEl = document.getElementById('sources');
-const geminiOverlay = document.querySelector('.gemini-overlay');
+const geminiOverlay = document.getElementById('geminiOverlay');
 
 function showLoader(on = true) {
   loader.classList.toggle('hidden', !on);
   askBtn.disabled = on;
   questionInput.disabled = on;
-}
-
-function showGeminiOverlay(on = true) {
-  geminiOverlay.classList.toggle('hidden', !on);
-  document.body.classList.toggle('blur', on);
 }
 
 function setAnswerText(text) {
@@ -56,8 +51,9 @@ async function askQuestion() {
   const q = questionInput.value.trim();
   if (!q) return;
 
-  // Show Gemini overlay + loader
-  showGeminiOverlay(true);
+  // Show Gemini overlay
+  geminiOverlay.classList.remove('hidden');
+
   answerSection.classList.add('hidden');
   showLoader(true);
 
@@ -77,17 +73,19 @@ async function askQuestion() {
     const answer = data.answer || 'No answer returned.';
     const sources = data.sources || [];
 
-    // Hide Gemini overlay + blur
-    showGeminiOverlay(false);
+    // hide Gemini overlay
+    geminiOverlay.classList.add('hidden');
 
-    // Show answer
+    // show answer
     answerSection.classList.remove('hidden');
     setAnswerText(answer);
     renderSources(sources);
+
+    // scroll into view
     answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
-    showGeminiOverlay(false);
+    geminiOverlay.classList.add('hidden');
     answerSection.classList.remove('hidden');
     answerEl.innerText = 'Error: ' + (err.message || err);
     sourcesEl.innerHTML = '';
