@@ -14,6 +14,10 @@ function showLoader(on = true) {
   questionInput.disabled = on;
 }
 
+function showGeminiOverlay(show = true) {
+  geminiOverlay.classList.toggle('hidden', !show);
+}
+
 function setAnswerText(text) {
   answerEl.innerHTML = '';
   let i = 0;
@@ -51,8 +55,8 @@ async function askQuestion() {
   const q = questionInput.value.trim();
   if (!q) return;
 
-  // Show Gemini overlay
-  geminiOverlay.classList.remove('hidden');
+  // Show Gemini loader
+  showGeminiOverlay(true);
 
   answerSection.classList.add('hidden');
   showLoader(true);
@@ -73,19 +77,17 @@ async function askQuestion() {
     const answer = data.answer || 'No answer returned.';
     const sources = data.sources || [];
 
-    // hide Gemini overlay
-    geminiOverlay.classList.add('hidden');
+    // hide Gemini loader
+    showGeminiOverlay(false);
 
     // show answer
     answerSection.classList.remove('hidden');
     setAnswerText(answer);
     renderSources(sources);
-
-    // scroll into view
     answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
-    geminiOverlay.classList.add('hidden');
+    showGeminiOverlay(false);
     answerSection.classList.remove('hidden');
     answerEl.innerText = 'Error: ' + (err.message || err);
     sourcesEl.innerHTML = '';
